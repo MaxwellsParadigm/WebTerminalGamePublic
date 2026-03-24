@@ -1,0 +1,580 @@
+/* ============================================================
+   WebTerm MMO — Catppuccin-inspired Soft Dark Pastel Theme
+   ============================================================ */
+:root {
+  /* Base palette (derived by themes.js) */
+  --bg-base: #1e1e2e;
+  --bg-surface: #181825;
+  --bg-mantle: #11111b;
+  --bg-overlay: #313244;
+
+  /* Text */
+  --text: #cdd6f4;
+  --text-dim: rgba(205, 214, 244, 0.5);
+  --text-subtle: rgba(205, 214, 244, 0.7);
+
+  /* ANSI Colors (0-15) */
+  --color0: #45475a;
+  --color1: #f38ba8;
+  --color2: #a6e3a1;
+  --color3: #f9e2af;
+  --color4: #89b4fa;
+  --color5: #f5c2e7;
+  --color6: #94e2d5;
+  --color7: #bac2de;
+  --color8: #585b70;
+  --color9: #f38ba8;
+  --color10: #a6e3a1;
+  --color11: #f9e2af;
+  --color12: #89b4fa;
+  --color13: #f5c2e7;
+  --color14: #94e2d5;
+  --color15: #a6adc8;
+
+  /* Functional (mapped by themes.js) */
+  --prompt-color: var(--color10);
+  --error-color: var(--color9);
+  --info-color: var(--color12);
+  --warn-color: var(--color11);
+  --success-color: var(--color10);
+  --system-color: var(--color13);
+  --chat-color: var(--color14);
+
+  /* Older references for compatibility or direct palette use */
+  --green: var(--color2);
+  --blue: var(--color4);
+  --purple: var(--color5);
+  --pink: var(--color5);
+  --red: var(--color1);
+  --yellow: var(--color3);
+  --teal: var(--color6);
+
+  /* Glow (dynamic — updated by themes.js) */
+  --glow-prompt: 0 0 8px rgba(166, 227, 161, 0.3);
+  /* Use color5 (purple/pink) for generic purple glow */
+  --glow-purple: 0 0 8px rgba(203, 166, 247, 0.3);
+  --glow-blue: 0 0 8px rgba(137, 180, 250, 0.3);
+
+  /* Terminal Geometry */
+  --border-radius: 12px;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  --font-size: 14px;
+  --line-height: 1.4;
+}
+
+/* ---- Reset ---- */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-mantle);
+  font-family: var(--font-mono);
+  font-size: var(--font-size);
+  color: var(--text);
+}
+
+/* ---- CRT Scanline Overlay ---- */
+#crt-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px);
+  mix-blend-mode: multiply;
+}
+
+/* ---- Terminal Container ---- */
+#terminal-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 960px;
+  height: calc(100vh - 40px);
+  margin: 20px auto;
+  background: var(--bg-base);
+  border: 1px solid var(--bg-overlay);
+  border-radius: var(--border-radius);
+  box-shadow:
+    0 0 40px rgba(0, 0, 0, 0.5),
+    0 0 80px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  overflow: hidden;
+}
+
+/* ---- Header Bar ---- */
+#terminal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 42px;
+  padding: 0 16px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--bg-overlay);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.header-dots {
+  display: flex;
+  gap: 7px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  opacity: 0.85;
+}
+
+.dot-red {
+  background: var(--red);
+}
+
+.dot-yellow {
+  background: var(--yellow);
+}
+
+.dot-green {
+  background: var(--green);
+}
+
+#header-title {
+  flex: 1;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+#header-status {
+    flex-grow: 1;
+    text-align: right;
+    margin-right: 15px;
+    color: var(--theme-dim);
+    font-size: 0.85em;
+    font-weight: 500;
+}
+
+#header-timer {
+    color: var(--theme-yellow);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.85em;
+    font-weight: 700;
+    min-width: 45px;
+}
+
+.timer-low {
+    color: var(--theme-red) !important;
+    animation: blink-red 1s step-end infinite;
+}
+
+@keyframes blink-red {
+    50% { opacity: 0.3; }
+}
+
+/* ---- Output Area ---- */
+#terminal-output {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+  line-height: var(--line-height);
+  white-space: pre-wrap;
+  word-break: break-word;
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-overlay) transparent;
+}
+
+#terminal-output::-webkit-scrollbar {
+  width: 6px;
+}
+
+#terminal-output::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#terminal-output::-webkit-scrollbar-thumb {
+  background: var(--bg-overlay);
+  border-radius: 3px;
+}
+
+/* ---- Input Line ---- */
+#terminal-input-line {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--bg-overlay);
+  flex-shrink: 0;
+  gap: 0;
+  position: relative;
+}
+
+#prompt {
+  color: var(--prompt-color);
+  font-weight: 500;
+  white-space: pre;
+  text-shadow: var(--glow-prompt);
+  flex-shrink: 0;
+}
+
+#input-visual-wrapper {
+  display: flex;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: var(--font-size);
+  line-height: var(--line-height);
+  flex: 1;
+}
+
+#terminal-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: text;
+  z-index: 10;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font-mono);
+  font-size: var(--font-size);
+  color: transparent;
+  caret-color: transparent;
+}
+
+/* ---- Caret System ---- */
+#cursor-block {
+  font-size: var(--font-size);
+  font-family: var(--font-mono);
+  pointer-events: none;
+  flex-shrink: 0;
+  min-width: 0.6em;
+  display: inline-block;
+}
+
+#cursor-block.caret-block {
+  background-color: var(--prompt-color);
+  color: var(--bg-surface);
+  animation: blink-cursor 1s step-end infinite;
+}
+
+#cursor-block.caret-underscore {
+  background-color: transparent;
+  color: var(--text);
+  border-bottom: 2px solid var(--prompt-color);
+  animation: blink-cursor 1s step-end infinite;
+}
+
+#cursor-block.caret-ibeam {
+  background-color: transparent;
+  color: var(--text);
+  box-shadow: -2px 0 0 var(--prompt-color);
+  animation: blink-cursor-soft 1.2s ease-in-out infinite;
+}
+
+#cursor-block.caret-matrix {
+  background-color: transparent;
+  color: var(--prompt-color);
+  text-shadow: var(--glow-prompt);
+  animation: none;
+}
+
+@keyframes blink-cursor {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes blink-cursor-soft {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.2;
+  }
+}
+
+/* ---- Output Line Styles ---- */
+.line {
+  min-height: 1.65em;
+}
+
+.line-error {
+  color: var(--error-color);
+}
+
+.line-info {
+  color: var(--info-color);
+}
+
+.line-warn {
+  color: var(--warn-color);
+}
+
+.line-success {
+  color: var(--success-color);
+}
+
+.line-system {
+  color: var(--system-color);
+}
+
+.line-dim {
+  color: var(--text-dim);
+}
+
+.line-chat {
+  color: var(--chat-color);
+}
+
+.line-pink {
+  color: var(--pink);
+}
+
+.line-peach {
+  color: var(--peach);
+}
+
+.line-sky {
+  color: var(--sky);
+}
+
+.line-lavender {
+  color: var(--lavender);
+}
+
+.line-bold {
+  font-weight: 700;
+}
+
+/* ASCII art & banners */
+.line-ascii, .line-fetch {
+  color: var(--purple);
+  text-shadow: var(--glow-purple);
+  line-height: 1.18;
+  min-height: 0;
+}
+
+.ascii-art {
+  line-height: 1 !important;
+  display: inline-block;
+  white-space: pre;
+}
+
+.c-col0 { color: var(--color0); }
+.c-col1 { color: var(--color1); }
+.c-col2 { color: var(--color2); }
+.c-col3 { color: var(--color3); }
+.c-col4 { color: var(--color4); }
+.c-col5 { color: var(--color5); }
+.c-col6 { color: var(--color6); }
+.c-col7 { color: var(--color7); }
+.c-col8 { color: var(--color8); }
+.c-col9 { color: var(--color9); }
+.c-col10 { color: var(--color10); }
+.c-col11 { color: var(--color11); }
+.c-col12 { color: var(--color12); }
+.c-col13 { color: var(--color13); }
+.c-col14 { color: var(--color14); }
+.c-col15 { color: var(--color15); }
+
+/* Prompt echo in output */
+.line-prompt-echo .prompt-part {
+  color: var(--prompt-color);
+  text-shadow: var(--glow-prompt);
+}
+
+.line-prompt-echo .cmd-part {
+  color: var(--text);
+}
+
+/* Inline colored spans */
+.c-green {
+  color: var(--green);
+}
+
+.c-blue {
+  color: var(--blue);
+}
+
+.c-purple {
+  color: var(--purple);
+}
+
+.c-pink {
+  color: var(--pink);
+}
+
+.c-peach {
+  color: var(--peach);
+}
+
+.c-red {
+  color: var(--red);
+}
+
+.c-yellow {
+  color: var(--yellow);
+}
+
+.c-teal {
+  color: var(--teal);
+}
+
+.c-sky {
+  color: var(--sky);
+}
+
+.c-dim {
+  color: var(--text-dim);
+}
+
+.c-lavender {
+  color: var(--lavender);
+}
+
+.c-bold {
+  font-weight: 700;
+}
+
+/* ---- Loading / Boot Animations ---- */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.line-animate {
+  animation: fade-in 0.15s ease forwards;
+}
+
+/* ---- Progress bar ---- */
+.progress-bar {
+  display: inline-block;
+  color: var(--green);
+  text-shadow: var(--glow-green);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 700px) {
+  #terminal-container {
+    margin: 0;
+    height: 100vh;
+    border-radius: 0;
+    border: none;
+    max-width: 100%;
+  }
+
+  #terminal-output {
+    padding: 12px 14px;
+  }
+
+  #terminal-input-line {
+    padding: 10px 14px;
+  }
+}
+
+/* ---- Selection ---- */
+::selection {
+  background: rgba(203, 166, 247, 0.25);
+  color: var(--text);
+}
+
+/* ---- Focus within the container ---- */
+#terminal-container:focus-within #terminal-header {
+  border-bottom-color: rgba(203, 166, 247, 0.15);
+}
+
+/* ---- Hidden helper ---- */
+.hidden {
+  display: none !important;
+}
+
+/* ---- Drive Overlay ---- */
+#drive-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: #000;
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  transition: opacity 0.5s ease;
+}
+
+#drive-overlay.hidden-overlay {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.drive-overlay-content {
+  text-align: center;
+  animation: fade-in 1s ease forwards;
+}
+
+.insert-drive-title {
+  color: var(--red);
+  font-size: 24px;
+  letter-spacing: 4px;
+  margin-bottom: 10px;
+  text-shadow: 0 0 10px rgba(243, 139, 168, 0.5);
+}
+
+.insert-drive-sub {
+  color: var(--text-dim);
+  font-size: 14px;
+  margin-bottom: 30px;
+  letter-spacing: 2px;
+}
+
+.drive-btn {
+  background: transparent;
+  border: 1px solid var(--purple);
+  color: var(--purple);
+  padding: 10px 20px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+
+.drive-btn:hover {
+  background: rgba(203, 166, 247, 0.1);
+  box-shadow: var(--glow-purple);
+}
